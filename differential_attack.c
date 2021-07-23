@@ -22,9 +22,8 @@ int main()
 	FILE *fp2;
 	int now, previous;
 	int flag=0;
-	
+	long long int line=1;
 //	char y_test[8], y_star_test[8];
-	long long int line;
 	
 	//초기화 
 	printf("초기화 시작\n");
@@ -40,10 +39,11 @@ int main()
 	printf("초기화 완료\n");
 
 	fp = fopen("CipherText.txt", "r");	//암호파일 읽기
-	fp2 = fopen("result2.txt", "w");	//결과파일 쓰기 
+	fp2 = fopen("result.txt", "w");	//결과파일 쓰기 
 	
 	printf("계산 시작\n");
-	for(line=0x00000001; line<=0x100000000; line++) {
+	
+	while (feof(fp) == 0) {
 		now=line/(16*16*16*16*16*16*16);
 		
 		if(flag==0){
@@ -60,6 +60,7 @@ int main()
 		
 		if(line%2==1){	//i가 홀수
 			fscanf(fp, "%X\n", &y);
+			line++;
 		} 
 		
 		else if(line%2==0){	//i가 짝수 
@@ -136,18 +137,19 @@ int main()
 			//					printf("u4_2_p: %X\n", u4_2_p);
 			//					printf("u4_4_p: %X\n", u4_4_p);	
 								
-								if(u4_1_p==0x8 && u4_3_p==0x4 && u4_5_p==0x8 && u4_7_p==0x4){
-									printf("found!!!\n");
+								if(u4_1_p==0x4 && u4_3_p==0x8 && u4_5_p==0x4 && u4_7_p==0x8){
+//									printf("found!!!\n");
 									count[L1][L2][L3][L4]++;
-									fprintf(fp2, "------------\n");
-									fprintf(fp2, "found, %X, %X, %X, %X\n", L1, L2, L3, L4);
-									fprintf(fp2, "------------\n");
+//									fprintf(fp2, "------------\n");
+//									fprintf(fp2, "found, %X, %X, %X, %X\n", L1, L2, L3, L4);
+//									fprintf(fp2, "------------\n");
 								}
 							}
 						}
 					}
 				}
 			}
+			line++;
 		} 
     } 
     printf("계산 완료\n");
@@ -176,8 +178,23 @@ int main()
 	}
 	fprintf(fp2, "[maxkey] L1: %X, L2: %X, L3: %X, L4: %X\n", max_L1, max_L2, max_L3, max_L4);
 	printf("최댓값 찾기 완료\n");
+	
+	printf("중복값 찾기시작\n");
+	for(L1=0; L1<=0xF; L1++){
+		for(L2=0; L2<=0xF; L2++){
+			for(L3=0; L3<=0xF; L3++){
+				for(L4=0; L4<=0xF; L4++){
+					if(count[L1][L2][L3][L4]==max){
+						fprintf(fp2, "[same max] L1: %X, L2: %X, L3: %X, L4: %X\n", L1, L2, L3, L4);
+					}
+				}
+			}
+		}
+	}
+	printf("중복값 찾기 완료\n");
 		
 	fclose(fp);
-
+	fclose(fp2);
+	
 	return 0;
 }
